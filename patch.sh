@@ -20,8 +20,8 @@ apply_patches() {
   local patch_dir="$SCRIPT_DIR/patches"
 
   cd "$patch_dir" || exit 1
-  find . -name "*.patch" | sort | while read -r patch_path; do
-    local repo_path=$(dirname "$patch_path")
+  find . -type f -name "*.patch" | sort | while read -r patch_path; do
+    local repo_path=$(dirname "${patch_path#*/*/}")
     local target_dir=$(readlink -f "$AOSP_DIR/$repo_path")
     local patch_file=$(readlink -f "$patch_dir/$patch_path")
 
