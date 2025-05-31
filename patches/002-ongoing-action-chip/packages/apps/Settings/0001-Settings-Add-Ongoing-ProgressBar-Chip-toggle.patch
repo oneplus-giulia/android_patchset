@@ -1,7 +1,7 @@
-From 7bf4e0ac1298a17e8177de51a83889533054cb22 Mon Sep 17 00:00:00 2001
+From 82c92733db1b55d936ad54a39c294b14bcabe41d Mon Sep 17 00:00:00 2001
 From: pexcn <pexcn97@gmail.com>
 Date: Wed, 21 May 2025 09:26:03 +0000
-Subject: [PATCH 1/2] Settings: Add Ongoing ProgressBar Chip toggle
+Subject: [PATCH] Settings: Add Ongoing ProgressBar Chip toggle
 
 ref: https://github.com/ProjectMatrixx/android_packages_apps_MatrixxSettings/commit/dc44266b655c76b7320fd48da22cebdefcc53480
 Signed-off-by: pexcn <pexcn97@gmail.com>
@@ -12,7 +12,7 @@ Signed-off-by: pexcn <pexcn97@gmail.com>
  3 files changed, 14 insertions(+)
 
 diff --git a/res/values-zh-rCN/custom_strings.xml b/res/values-zh-rCN/custom_strings.xml
-index c2ea410..735091c 100644
+index c2ea41036c8..735091cfae1 100644
 --- a/res/values-zh-rCN/custom_strings.xml
 +++ b/res/values-zh-rCN/custom_strings.xml
 @@ -267,4 +267,7 @@
@@ -24,10 +24,10 @@ index c2ea410..735091c 100644
 +    <string name="ongoing_action_chip_summary">在状态栏中显示通知进度条</string>
  </resources>
 diff --git a/res/values/custom_strings.xml b/res/values/custom_strings.xml
-index b7a3784..969ea61 100644
+index 4dbf6d5a4ea..42d7bbcf708 100644
 --- a/res/values/custom_strings.xml
 +++ b/res/values/custom_strings.xml
-@@ -316,4 +316,8 @@
+@@ -307,4 +307,8 @@
      <string name="show_qs_on_secure_keyguard_title">Quick settings</string>
      <string name="show_qs_on_secure_keyguard_summary">Allow toggling quick settings on secure lockscreen</string>
  
@@ -37,7 +37,7 @@ index b7a3784..969ea61 100644
 +
  </resources>
 diff --git a/res/xml/display_settings.xml b/res/xml/display_settings.xml
-index 5e6903e..4c38a13 100644
+index 5e6903ef056..4c38a139ff3 100644
 --- a/res/xml/display_settings.xml
 +++ b/res/xml/display_settings.xml
 @@ -100,6 +100,13 @@
@@ -55,5 +55,5 @@ index 5e6903e..4c38a13 100644
  
      <PreferenceCategory
 -- 
-2.43.0
+2.49.0
 
