@@ -1,0 +1,798 @@
+From 88d21da15ae931c29ace126c2590c688f39db0ca Mon Sep 17 00:00:00 2001
+From: pexcn <pexcn97@gmail.com>
+Date: Sat, 31 May 2025 22:39:03 +0800
+Subject: [PATCH 1/2] Revert "SystemUI: Introduce network speed indicator on
+ statusbar"
+
+This reverts commit 13b30c5f68bc3277290f285b6554262fe0442ce3.
+---
+ .../status_bar_mobile_signal_group_inner.xml  |  5 -
+ .../drawable/ic_statusbar_network_speed.xml   | 10 --
+ .../res/layout/status_bar_network_speed.xml   | 32 -------
+ .../layout/status_bar_wifi_group_inner.xml    |  5 -
+ .../SystemUI/res/values/custom_strings.xml    |  3 -
+ .../SystemUI/res/xml/status_bar_prefs.xml     |  6 --
+ .../dagger/StatusBarPipelineModule.kt         | 15 ---
+ .../mobile/ui/binder/MobileIconBinder.kt      |  9 --
+ .../ui/viewmodel/MobileIconViewModel.kt       | 16 ----
+ .../ui/viewmodel/MobileIconsViewModel.kt      |  3 -
+ .../data/repository/NetworkSpeedRepository.kt | 71 --------------
+ .../interactor/NetworkSpeedInteractor.kt      | 95 -------------------
+ .../ui/binder/NetworkSpeedViewBinder.kt       | 70 --------------
+ .../netspeed/ui/model/NetworkSpeedIcon.kt     | 26 -----
+ .../netspeed/ui/model/NetworkSpeedUnit.kt     | 27 ------
+ .../ui/viewmodel/NetworkSpeedViewModel.kt     | 59 ------------
+ .../pipeline/wifi/ui/binder/WifiViewBinder.kt |  8 --
+ .../wifi/ui/viewmodel/WifiViewModel.kt        |  5 -
+ .../wifi/ui/viewmodel/WifiViewModelCommon.kt  |  4 -
+ 19 files changed, 469 deletions(-)
+ delete mode 100644 packages/SystemUI/res/drawable/ic_statusbar_network_speed.xml
+ delete mode 100644 packages/SystemUI/res/layout/status_bar_network_speed.xml
+ delete mode 100644 packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/data/repository/NetworkSpeedRepository.kt
+ delete mode 100644 packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/domain/interactor/NetworkSpeedInteractor.kt
+ delete mode 100644 packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/binder/NetworkSpeedViewBinder.kt
+ delete mode 100644 packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/model/NetworkSpeedIcon.kt
+ delete mode 100644 packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/model/NetworkSpeedUnit.kt
+ delete mode 100644 packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/viewmodel/NetworkSpeedViewModel.kt
+
+diff --git a/packages/SystemUI/res-keyguard/layout/status_bar_mobile_signal_group_inner.xml b/packages/SystemUI/res-keyguard/layout/status_bar_mobile_signal_group_inner.xml
+index ae756a22d7eb..25cadfbb0a79 100644
+--- a/packages/SystemUI/res-keyguard/layout/status_bar_mobile_signal_group_inner.xml
++++ b/packages/SystemUI/res-keyguard/layout/status_bar_mobile_signal_group_inner.xml
+@@ -28,11 +28,6 @@
+         android:gravity="center_vertical"
+         android:orientation="horizontal" >
+ 
+-        <include
+-            layout="@layout/status_bar_network_speed"
+-            android:layout_marginStart="2.5dp"
+-            android:visibility="gone"/>
+-
+         <FrameLayout
+             android:id="@+id/inout_container"
+             android:layout_height="@dimen/status_bar_mobile_inout_container_size"
+diff --git a/packages/SystemUI/res/drawable/ic_statusbar_network_speed.xml b/packages/SystemUI/res/drawable/ic_statusbar_network_speed.xml
+deleted file mode 100644
+index d50321a274db..000000000000
+--- a/packages/SystemUI/res/drawable/ic_statusbar_network_speed.xml
++++ /dev/null
+@@ -1,10 +0,0 @@
+-<vector xmlns:android="http://schemas.android.com/apk/res/android"
+-    android:width="24dp"
+-    android:height="24dp"
+-    android:viewportWidth="960"
+-    android:viewportHeight="960"
+-    android:tint="?attr/colorControlNormal">
+-  <path
+-      android:fillColor="@android:color/white"
+-      android:pathData="M418,620Q442,644 480,643.5Q518,643 536,616L760,280L424,504Q397,522 395.5,559Q394,596 418,620ZM480,160Q539,160 593.5,176.5Q648,193 696,226L620,274Q587,257 551.5,248.5Q516,240 480,240Q347,240 253.5,333.5Q160,427 160,560Q160,602 171.5,643Q183,684 204,720L756,720Q779,682 789.5,641Q800,600 800,556Q800,520 791.5,486Q783,452 766,420L814,344Q844,391 861.5,444Q879,497 880,554Q881,611 867,663Q853,715 826,762Q815,780 796,790Q777,800 756,800L204,800Q183,800 164,790Q145,780 134,762Q108,717 94,666.5Q80,616 80,560Q80,477 111.5,404.5Q143,332 197.5,277.5Q252,223 325,191.5Q398,160 480,160ZM487,473L487,473Q487,473 487,473Q487,473 487,473Q487,473 487,473Q487,473 487,473Q487,473 487,473Q487,473 487,473L487,473L487,473L487,473Q487,473 487,473Q487,473 487,473Q487,473 487,473Q487,473 487,473Z"/>
+-</vector>
+diff --git a/packages/SystemUI/res/layout/status_bar_network_speed.xml b/packages/SystemUI/res/layout/status_bar_network_speed.xml
+deleted file mode 100644
+index 42a78dbc0cca..000000000000
+--- a/packages/SystemUI/res/layout/status_bar_network_speed.xml
++++ /dev/null
+@@ -1,32 +0,0 @@
+-<?xml version="1.0" encoding="utf-8"?>
+-<!--
+-   SPDX-FileCopyrightText: 2025 Paranoid Android
+-   SPDX-License-Identifier: Apache-2.0
+--->
+-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+-    <com.android.keyguard.AlphaOptimizedLinearLayout
+-        android:id="@+id/network_speed"
+-        android:orientation="vertical"
+-        android:layout_width="wrap_content"
+-        android:layout_height="match_parent"
+-        android:gravity="center_vertical">
+-
+-        <TextView
+-            android:id="@+id/network_speed_text"
+-            android:layout_width="match_parent"
+-            android:layout_height="wrap_content"
+-            android:layout_gravity="center_vertical"
+-            android:textSize="8sp"
+-            android:textAlignment="center"
+-            android:includeFontPadding="false"/>
+-
+-        <TextView
+-            android:id="@+id/network_speed_unit_text"
+-            android:layout_width="match_parent"
+-            android:layout_height="wrap_content"
+-            android:layout_gravity="center_vertical"
+-            android:textSize="6sp"
+-            android:textAlignment="center"
+-            android:includeFontPadding="false"/>
+-    </com.android.keyguard.AlphaOptimizedLinearLayout>
+-</merge>
+diff --git a/packages/SystemUI/res/layout/status_bar_wifi_group_inner.xml b/packages/SystemUI/res/layout/status_bar_wifi_group_inner.xml
+index fda74d71a69d..e8b8922a138d 100644
+--- a/packages/SystemUI/res/layout/status_bar_wifi_group_inner.xml
++++ b/packages/SystemUI/res/layout/status_bar_wifi_group_inner.xml
+@@ -26,11 +26,6 @@
+         android:gravity="center_vertical"
+         android:layout_marginStart="2.5sp"
+     >
+-        <include
+-            layout="@layout/status_bar_network_speed"
+-            android:layout_marginEnd="3dp"
+-            android:visibility="gone"/>
+-
+         <FrameLayout
+                 android:id="@+id/inout_container"
+                 android:layout_height="@dimen/status_bar_wifi_inout_container_size"
+diff --git a/packages/SystemUI/res/values/custom_strings.xml b/packages/SystemUI/res/values/custom_strings.xml
+index 657c87d22502..af0944109cac 100644
+--- a/packages/SystemUI/res/values/custom_strings.xml
++++ b/packages/SystemUI/res/values/custom_strings.xml
+@@ -63,9 +63,6 @@
+     <!-- Name of the data saver status bar icon. -->
+     <string name="status_bar_data_saver">Data saver</string>
+ 
+-    <!-- Name of the Internet speed indicator icon. -->
+-    <string name="status_bar_network_speed">Internet speed</string>
+-
+     <!-- Text while recognizing face -->
+     <string name="face_unlock_recognizing">Recognizing face...</string>
+ 
+diff --git a/packages/SystemUI/res/xml/status_bar_prefs.xml b/packages/SystemUI/res/xml/status_bar_prefs.xml
+index bc20517d0789..a94bf074525c 100644
+--- a/packages/SystemUI/res/xml/status_bar_prefs.xml
++++ b/packages/SystemUI/res/xml/status_bar_prefs.xml
+@@ -58,12 +58,6 @@
+         android:title="@*android:string/volume_unknown"
+         android:icon="@drawable/ic_statusbar_mute" />
+ 
+-    <com.android.systemui.tuner.TunerSwitch
+-        android:icon="@drawable/ic_statusbar_network_speed"
+-        android:key="status_bar_network_speed"
+-        android:title="@string/status_bar_network_speed"
+-        sysui:defValue="false" />
+-
+     <com.android.systemui.tuner.StatusBarSwitch
+         android:key="wifi"
+         android:title="@string/quick_settings_wifi_label"
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/dagger/StatusBarPipelineModule.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/dagger/StatusBarPipelineModule.kt
+index c1345073dbff..bfdc8bd5e4c8 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/dagger/StatusBarPipelineModule.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/dagger/StatusBarPipelineModule.kt
+@@ -42,12 +42,6 @@ import com.android.systemui.statusbar.pipeline.mobile.util.MobileMappingsProxy
+ import com.android.systemui.statusbar.pipeline.mobile.util.MobileMappingsProxyImpl
+ import com.android.systemui.statusbar.pipeline.mobile.util.SubscriptionManagerProxy
+ import com.android.systemui.statusbar.pipeline.mobile.util.SubscriptionManagerProxyImpl
+-import com.android.systemui.statusbar.pipeline.netspeed.data.repository.NetworkSpeedRepository
+-import com.android.systemui.statusbar.pipeline.netspeed.data.repository.NetworkSpeedRepositoryImpl
+-import com.android.systemui.statusbar.pipeline.netspeed.domain.interactor.NetworkSpeedInteractor
+-import com.android.systemui.statusbar.pipeline.netspeed.domain.interactor.NetworkSpeedInteractorImpl
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.viewmodel.NetworkSpeedViewModel
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.viewmodel.NetworkSpeedViewModelImpl
+ import com.android.systemui.statusbar.pipeline.satellite.data.DeviceBasedSatelliteRepository
+ import com.android.systemui.statusbar.pipeline.satellite.data.DeviceBasedSatelliteRepositorySwitcher
+ import com.android.systemui.statusbar.pipeline.satellite.data.RealDeviceBasedSatelliteRepository
+@@ -149,15 +143,6 @@ abstract class StatusBarPipelineModule {
+     @Binds
+     abstract fun homeStatusBarViewBinder(impl: HomeStatusBarViewBinderImpl): HomeStatusBarViewBinder
+ 
+-    @Binds
+-    abstract fun networkSpeedRepository(impl: NetworkSpeedRepositoryImpl): NetworkSpeedRepository
+-
+-    @Binds
+-    abstract fun networkSpeedInteractor(impl: NetworkSpeedInteractorImpl): NetworkSpeedInteractor
+-
+-    @Binds
+-    abstract fun networkSpeedViewModel(impl: NetworkSpeedViewModelImpl): NetworkSpeedViewModel
+-
+     companion object {
+ 
+         @Provides
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/binder/MobileIconBinder.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/binder/MobileIconBinder.kt
+index b4abf8102b29..31d349eb4cca 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/binder/MobileIconBinder.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/binder/MobileIconBinder.kt
+@@ -41,7 +41,6 @@ import com.android.systemui.statusbar.StatusBarIconView.STATE_HIDDEN
+ import com.android.systemui.statusbar.pipeline.mobile.domain.model.SignalIconModel
+ import com.android.systemui.statusbar.pipeline.mobile.ui.MobileViewLogger
+ import com.android.systemui.statusbar.pipeline.mobile.ui.viewmodel.LocationBasedMobileViewModel
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.binder.NetworkSpeedViewBinder
+ import com.android.systemui.statusbar.pipeline.shared.ui.binder.ModernStatusBarViewBinding
+ import com.android.systemui.statusbar.pipeline.shared.ui.binder.ModernStatusBarViewVisibilityHelper
+ import com.android.systemui.statusbar.pipeline.shared.ui.binder.StatusBarViewBinderConstants.ALPHA_ACTIVE
+@@ -49,7 +48,6 @@ import com.android.systemui.statusbar.pipeline.shared.ui.binder.StatusBarViewBin
+ import kotlinx.coroutines.awaitCancellation
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.distinctUntilChanged
+-import kotlinx.coroutines.flow.map
+ import com.android.app.tracing.coroutines.launchTraced as launch
+ 
+ private data class Colors(
+@@ -77,7 +75,6 @@ object MobileIconBinder {
+         val roamingView = view.requireViewById<ImageView>(R.id.mobile_roaming)
+         val roamingSpace = view.requireViewById<Space>(R.id.mobile_roaming_space)
+         val dotView = view.requireViewById<StatusBarIconView>(R.id.status_bar_dot)
+-        val networkSpeedView = view.requireViewById<ViewGroup>(R.id.network_speed)
+ 
+         view.isVisible = viewModel.isVisible.value
+         iconView.isVisible = true
+@@ -269,12 +266,6 @@ object MobileIconBinder {
+             }
+         }
+ 
+-        NetworkSpeedViewBinder.bind(
+-            view = networkSpeedView,
+-            icon = viewModel.networkSpeedIcon,
+-            iconTint = iconTint.map { it.tint }
+-        )
+-
+         return object : ModernStatusBarViewBinding {
+             override fun getShouldIconBeVisible(): Boolean {
+                 return viewModel.isVisible.value
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconViewModel.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconViewModel.kt
+index e8997258b208..103b0e3a6f27 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconViewModel.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconViewModel.kt
+@@ -28,8 +28,6 @@ import com.android.systemui.statusbar.pipeline.airplane.domain.interactor.Airpla
+ import com.android.systemui.statusbar.pipeline.mobile.domain.interactor.MobileIconInteractor
+ import com.android.systemui.statusbar.pipeline.mobile.domain.interactor.MobileIconsInteractor
+ import com.android.systemui.statusbar.pipeline.mobile.domain.model.SignalIconModel
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.model.NetworkSpeedIcon
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.viewmodel.NetworkSpeedViewModel
+ import com.android.systemui.statusbar.pipeline.shared.ConnectivityConstants
+ import com.android.systemui.statusbar.pipeline.shared.data.model.DataActivityModel
+ import kotlinx.coroutines.CoroutineScope
+@@ -61,7 +59,6 @@ interface MobileIconViewModelCommon {
+     val activityInVisible: Flow<Boolean>
+     val activityOutVisible: Flow<Boolean>
+     val activityContainerVisible: Flow<Boolean>
+-    val networkSpeedIcon: Flow<NetworkSpeedIcon>
+ }
+ 
+ /**
+@@ -82,7 +79,6 @@ class MobileIconViewModel(
+     override val subscriptionId: Int,
+     iconInteractor: MobileIconInteractor,
+     airplaneModeInteractor: AirplaneModeInteractor,
+-    networkSpeedViewModel: NetworkSpeedViewModel,
+     constants: ConnectivityConstants,
+     flags: FeatureFlagsClassic,
+     scope: CoroutineScope,
+@@ -92,7 +88,6 @@ class MobileIconViewModel(
+             subscriptionId,
+             iconInteractor,
+             airplaneModeInteractor,
+-            networkSpeedViewModel,
+             constants,
+             flags,
+             scope,
+@@ -149,9 +144,6 @@ class MobileIconViewModel(
+ 
+     override val activityContainerVisible: Flow<Boolean> =
+         vmProvider.flatMapLatest { it.activityContainerVisible }
+-
+-    override val networkSpeedIcon: Flow<NetworkSpeedIcon> =
+-        vmProvider.flatMapLatest { it.networkSpeedIcon }
+ }
+ 
+ /** Representation of this network when it is non-terrestrial (e.g., satellite) */
+@@ -172,7 +164,6 @@ private class CarrierBasedSatelliteViewModelImpl(
+     override val activityInVisible: Flow<Boolean> = flowOf(false)
+     override val activityOutVisible: Flow<Boolean> = flowOf(false)
+     override val activityContainerVisible: Flow<Boolean> = flowOf(false)
+-    override val networkSpeedIcon: Flow<NetworkSpeedIcon> = flowOf(NetworkSpeedIcon.Disabled)
+ }
+ 
+ /** Terrestrial (cellular) icon. */
+@@ -182,7 +173,6 @@ private class CellularIconViewModel(
+     override val subscriptionId: Int,
+     iconInteractor: MobileIconInteractor,
+     airplaneModeInteractor: AirplaneModeInteractor,
+-    networkSpeedViewModel: NetworkSpeedViewModel,
+     constants: ConnectivityConstants,
+     flags: FeatureFlagsClassic,
+     scope: CoroutineScope,
+@@ -326,10 +316,4 @@ private class CellularIconViewModel(
+                 activity.map { it != null && (it.hasActivityIn || it.hasActivityOut) }
+             }
+             .stateIn(scope, SharingStarted.WhileSubscribed(), false)
+-
+-    override val networkSpeedIcon: Flow<NetworkSpeedIcon> =
+-        networkTypeIcon.flatMapLatest { typeIcon ->
+-            // Show network speed only when mobile data is active (type icon is visible)
+-            typeIcon?.let { networkSpeedViewModel.icon } ?: flowOf(NetworkSpeedIcon.Disabled)
+-        }
+ }
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconsViewModel.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconsViewModel.kt
+index 2e74b9c1c59e..2efbfbbf78c8 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconsViewModel.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconsViewModel.kt
+@@ -27,7 +27,6 @@ import com.android.systemui.statusbar.pipeline.mobile.domain.interactor.MobileIc
+ import com.android.systemui.statusbar.pipeline.mobile.ui.MobileViewLogger
+ import com.android.systemui.statusbar.pipeline.mobile.ui.VerboseMobileViewLogger
+ import com.android.systemui.statusbar.pipeline.mobile.ui.view.ModernStatusBarMobileView
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.viewmodel.NetworkSpeedViewModel
+ import com.android.systemui.statusbar.pipeline.shared.ConnectivityConstants
+ import javax.inject.Inject
+ import kotlin.coroutines.CoroutineContext
+@@ -58,7 +57,6 @@ constructor(
+     private val verboseLogger: VerboseMobileViewLogger,
+     private val interactor: MobileIconsInteractor,
+     private val airplaneModeInteractor: AirplaneModeInteractor,
+-    private val networkSpeedViewModel: NetworkSpeedViewModel,
+     private val constants: ConnectivityConstants,
+     private val flags: FeatureFlagsClassic,
+     @Application private val scope: CoroutineScope,
+@@ -124,7 +122,6 @@ constructor(
+                 subId,
+                 interactor.getMobileConnectionInteractorForSubId(subId),
+                 airplaneModeInteractor,
+-                networkSpeedViewModel,
+                 constants,
+                 flags,
+                 vmScope,
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/data/repository/NetworkSpeedRepository.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/data/repository/NetworkSpeedRepository.kt
+deleted file mode 100644
+index 180aac7d9f2a..000000000000
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/data/repository/NetworkSpeedRepository.kt
++++ /dev/null
+@@ -1,71 +0,0 @@
+-/*
+- * SPDX-FileCopyrightText: 2025 Paranoid Android
+- * SPDX-License-Identifier: Apache-2.0
+- */
+-
+-package com.android.systemui.statusbar.pipeline.netspeed.data.repository
+-
+-import android.net.TrafficStats
+-import android.util.Log
+-import com.android.systemui.common.coroutine.ConflatedCallbackFlow.conflatedCallbackFlow
+-import com.android.systemui.dagger.SysUISingleton
+-import com.android.systemui.dagger.qualifiers.Application
+-import com.android.systemui.tuner.TunerService
+-import javax.inject.Inject
+-import kotlinx.coroutines.CoroutineScope
+-import kotlinx.coroutines.channels.awaitClose
+-import kotlinx.coroutines.delay
+-import kotlinx.coroutines.flow.Flow
+-import kotlinx.coroutines.flow.distinctUntilChanged
+-import kotlinx.coroutines.flow.flow
+-
+-interface NetworkSpeedRepository {
+-    val isSettingEnabled: Flow<Boolean>
+-    val totalBytes: Flow<Long>
+-}
+-
+-@SysUISingleton
+-class NetworkSpeedRepositoryImpl
+-@Inject
+-constructor(
+-    tunerService: TunerService,
+-    @Application scope: CoroutineScope,
+-) : NetworkSpeedRepository {
+-
+-    override val isSettingEnabled =
+-        conflatedCallbackFlow {
+-                val callback =
+-                    object : TunerService.Tunable {
+-                        override fun onTuningChanged(key: String, newValue: String?) {
+-                            if (key != KEY_NETWORK_SPEED) return
+-                            val enabled = TunerService.parseIntegerSwitch(newValue, false)
+-                            dlog("onTuningChanged: enabled=$enabled")
+-                            trySend(enabled)
+-                        }
+-                    }
+-
+-                tunerService.addTunable(callback, KEY_NETWORK_SPEED)
+-
+-                awaitClose { tunerService.removeTunable(callback) }
+-            }
+-            .distinctUntilChanged()
+-
+-    override val totalBytes = flow {
+-        while (true) {
+-            val total = TrafficStats.getTotalRxBytes() + TrafficStats.getTotalTxBytes()
+-            dlog("totalBytes=$total")
+-            emit(total)
+-            delay(1000L)
+-        }
+-    }
+-
+-    companion object {
+-        private const val TAG = "NetworkSpeedRepository"
+-        private val DEBUG = Log.isLoggable(TAG, Log.DEBUG)
+-        private const val KEY_NETWORK_SPEED = "status_bar_network_speed"
+-
+-        private inline fun dlog(msg: String) {
+-            if (DEBUG) Log.d(TAG, msg)
+-        }
+-    }
+-}
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/domain/interactor/NetworkSpeedInteractor.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/domain/interactor/NetworkSpeedInteractor.kt
+deleted file mode 100644
+index 1579e4088357..000000000000
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/domain/interactor/NetworkSpeedInteractor.kt
++++ /dev/null
+@@ -1,95 +0,0 @@
+-/*
+- * SPDX-FileCopyrightText: 2025 Paranoid Android
+- * SPDX-License-Identifier: Apache-2.0
+- */
+-
+-package com.android.systemui.statusbar.pipeline.netspeed.domain.interactor
+-
+-import android.util.Log
+-import com.android.systemui.dagger.SysUISingleton
+-import com.android.systemui.dagger.qualifiers.Application
+-import com.android.systemui.power.data.repository.PowerRepository
+-import com.android.systemui.statusbar.pipeline.netspeed.data.repository.NetworkSpeedRepository
+-import com.android.systemui.statusbar.pipeline.shared.data.repository.ConnectivityRepository
+-import com.android.systemui.util.kotlin.throttle
+-import javax.inject.Inject
+-import kotlinx.coroutines.CoroutineScope
+-import kotlinx.coroutines.coroutineScope
+-import kotlinx.coroutines.flow.SharingStarted
+-import kotlinx.coroutines.flow.StateFlow
+-import kotlinx.coroutines.flow.combine
+-import kotlinx.coroutines.flow.distinctUntilChanged
+-import kotlinx.coroutines.flow.flow
+-import kotlinx.coroutines.flow.stateIn
+-
+-interface NetworkSpeedInteractor {
+-    val isEnabled: StateFlow<Boolean>
+-    val speedBytes: StateFlow<Long>
+-}
+-
+-@SysUISingleton
+-class NetworkSpeedInteractorImpl
+-@Inject
+-constructor(
+-    repository: NetworkSpeedRepository,
+-    connectivityRepository: ConnectivityRepository,
+-    powerRepository: PowerRepository,
+-    @Application scope: CoroutineScope,
+-) : NetworkSpeedInteractor {
+-
+-    override val isEnabled =
+-        combine(
+-                repository.isSettingEnabled,
+-                connectivityRepository.defaultConnections,
+-                powerRepository.isInteractive,
+-            ) { isSettingEnabled, defaultConnections, isInteractive ->
+-                val hasConnection = defaultConnections.run { wifi.isDefault || mobile.isDefault }
+-                dlog(
+-                    "isSettingEnabled=$isSettingEnabled hasConnection=$hasConnection " +
+-                        "isInteractive=$isInteractive"
+-                )
+-                isSettingEnabled && isInteractive && hasConnection
+-            }
+-            .distinctUntilChanged()
+-            .stateIn(
+-                scope = scope,
+-                started = SharingStarted.WhileSubscribed(),
+-                initialValue = false,
+-            )
+-
+-    override val speedBytes =
+-        flow {
+-                coroutineScope {
+-                    var prevBytes = 0L
+-                    var firstRun = true
+-
+-                    repository.totalBytes.collect { totalBytes ->
+-                        val delta = totalBytes - prevBytes
+-                        prevBytes = totalBytes
+-                        dlog("speed delta=$delta")
+-
+-                        if (firstRun) {
+-                            firstRun = false
+-                            emit(0L)
+-                        } else {
+-                            emit(delta)
+-                        }
+-                    }
+-                }
+-            }
+-            .throttle(1500L) // refresh icon only every 1.5 sec
+-            .stateIn(
+-                scope = scope,
+-                started = SharingStarted.WhileSubscribed(),
+-                initialValue = 0L
+-            )
+-
+-    companion object {
+-        private const val TAG = "NetworkSpeedInteractor"
+-        private val DEBUG = Log.isLoggable(TAG, Log.DEBUG)
+-
+-        private inline fun dlog(msg: String) {
+-            if (DEBUG) Log.d(TAG, msg)
+-        }
+-    }
+-}
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/binder/NetworkSpeedViewBinder.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/binder/NetworkSpeedViewBinder.kt
+deleted file mode 100644
+index 1e8c2c961b7f..000000000000
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/binder/NetworkSpeedViewBinder.kt
++++ /dev/null
+@@ -1,70 +0,0 @@
+-/*
+- * SPDX-FileCopyrightText: 2025 Paranoid Android
+- * SPDX-License-Identifier: Apache-2.0
+- */
+-
+-package com.android.systemui.statusbar.pipeline.netspeed.ui.binder
+-
+-import android.annotation.ColorInt
+-import android.content.res.ColorStateList
+-import android.view.ViewGroup
+-import android.widget.LinearLayout
+-import android.widget.TextView
+-import androidx.core.view.isVisible
+-import androidx.core.view.updateLayoutParams
+-import androidx.lifecycle.Lifecycle
+-import androidx.lifecycle.repeatOnLifecycle
+-import com.android.systemui.lifecycle.repeatWhenAttached
+-import com.android.systemui.res.R
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.model.NetworkSpeedIcon
+-import kotlin.math.roundToInt
+-import kotlinx.coroutines.flow.Flow
+-import kotlinx.coroutines.flow.launchIn
+-import kotlinx.coroutines.flow.onEach
+-
+-const val TAG = "NetworkSpeedViewBinder"
+-
+-object NetworkSpeedViewBinder {
+-    @JvmStatic
+-    fun bind(view: ViewGroup, icon: Flow<NetworkSpeedIcon>, @ColorInt iconTint: Flow<Int>) =
+-        view.run {
+-            val containerView = requireViewById<LinearLayout>(R.id.network_speed)
+-            val speedTextView = requireViewById<TextView>(R.id.network_speed_text)
+-            val unitTextView = requireViewById<TextView>(R.id.network_speed_unit_text)
+-
+-            isVisible = false
+-
+-            // Use a reasonable fixed width to prevent statusbar items shifting on each refresh.
+-            updateLayoutParams<LinearLayout.LayoutParams> {
+-                width = speedTextView.paint.measureText("00.00").roundToInt()
+-            }
+-
+-            repeatWhenAttached {
+-                repeatOnLifecycle(Lifecycle.State.STARTED) {
+-                    // Log.d(TAG, "Lifecycle.State.STARTED")
+-                    icon
+-                        .onEach { icon ->
+-                            when (icon) {
+-                                is NetworkSpeedIcon.Enabled -> {
+-                                    isVisible = true
+-                                    speedTextView.text = icon.formatSpeed()
+-                                    unitTextView.text = icon.unit.label
+-                                }
+-                                is NetworkSpeedIcon.Disabled -> {
+-                                    isVisible = false
+-                                }
+-                            }
+-                        }
+-                        .launchIn(this)
+-
+-                    iconTint
+-                        .onEach { tint ->
+-                            val tintList = ColorStateList.valueOf(tint)
+-                            speedTextView.setTextColor(tintList)
+-                            unitTextView.setTextColor(tintList)
+-                        }
+-                        .launchIn(this)
+-                }
+-            }
+-        }
+-}
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/model/NetworkSpeedIcon.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/model/NetworkSpeedIcon.kt
+deleted file mode 100644
+index 8d995cb0a560..000000000000
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/model/NetworkSpeedIcon.kt
++++ /dev/null
+@@ -1,26 +0,0 @@
+-/*
+- * SPDX-FileCopyrightText: 2025 Paranoid Android
+- * SPDX-License-Identifier: Apache-2.0
+- */
+-
+-package com.android.systemui.statusbar.pipeline.netspeed.ui.model
+-
+-import android.icu.text.DecimalFormat
+-
+-sealed interface NetworkSpeedIcon {
+-
+-    data object Disabled : NetworkSpeedIcon
+-
+-    data class Enabled(val speed: Float, val unit: NetworkSpeedUnit) : NetworkSpeedIcon {
+-
+-        fun formatSpeed() =
+-            DecimalFormat(
+-                    when {
+-                        speed < 10f -> "#.##"
+-                        speed < 100f -> "##.#"
+-                        else -> "###"
+-                    }
+-                )
+-                .format(speed)
+-    }
+-}
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/model/NetworkSpeedUnit.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/model/NetworkSpeedUnit.kt
+deleted file mode 100644
+index 46d93a4b7584..000000000000
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/model/NetworkSpeedUnit.kt
++++ /dev/null
+@@ -1,27 +0,0 @@
+-/*
+- * SPDX-FileCopyrightText: 2025 Paranoid Android
+- * SPDX-License-Identifier: Apache-2.0
+- */
+-
+-package com.android.systemui.statusbar.pipeline.netspeed.ui.model
+-
+-sealed class NetworkSpeedUnit(val label: String, val bytes: Int) {
+-    data object Kbps : NetworkSpeedUnit("KB/s", KB)
+-
+-    data object Mbps : NetworkSpeedUnit("MB/s", MB)
+-
+-    data object Gbps : NetworkSpeedUnit("GB/s", GB)
+-
+-    companion object {
+-        private const val KB = 1024
+-        private const val MB = KB * 1024
+-        private const val GB = MB * 1024
+-
+-        fun fromBytes(bytes: Long) =
+-            when {
+-                bytes < MB -> Kbps
+-                bytes < GB -> Mbps
+-                else -> Gbps
+-            }
+-    }
+-}
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/viewmodel/NetworkSpeedViewModel.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/viewmodel/NetworkSpeedViewModel.kt
+deleted file mode 100644
+index 286861fe0755..000000000000
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/netspeed/ui/viewmodel/NetworkSpeedViewModel.kt
++++ /dev/null
+@@ -1,59 +0,0 @@
+-/*
+- * SPDX-FileCopyrightText: 2025 Paranoid Android
+- * SPDX-License-Identifier: Apache-2.0
+- */
+-
+-package com.android.systemui.statusbar.pipeline.netspeed.ui.viewmodel
+-
+-import com.android.systemui.dagger.SysUISingleton
+-import com.android.systemui.dagger.qualifiers.Application
+-import com.android.systemui.statusbar.pipeline.netspeed.domain.interactor.NetworkSpeedInteractor
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.model.NetworkSpeedIcon
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.model.NetworkSpeedUnit
+-import javax.inject.Inject
+-import kotlinx.coroutines.CoroutineScope
+-import kotlinx.coroutines.flow.SharingStarted
+-import kotlinx.coroutines.flow.StateFlow
+-import kotlinx.coroutines.flow.distinctUntilChanged
+-import kotlinx.coroutines.flow.flatMapLatest
+-import kotlinx.coroutines.flow.flowOf
+-import kotlinx.coroutines.flow.map
+-import kotlinx.coroutines.flow.stateIn
+-
+-interface NetworkSpeedViewModel {
+-    val icon: StateFlow<NetworkSpeedIcon>
+-}
+-
+-@SysUISingleton
+-class NetworkSpeedViewModelImpl
+-@Inject
+-constructor(val interactor: NetworkSpeedInteractor, @Application val scope: CoroutineScope) :
+-    NetworkSpeedViewModel {
+-
+-    override val icon =
+-        interactor.isEnabled
+-            .flatMapLatest { isEnabled ->
+-                if (isEnabled) {
+-                    interactor.speedBytes.map { speedBytes ->
+-                        val unit = NetworkSpeedUnit.fromBytes(speedBytes)
+-                        val bytes = speedBytes.toFloat() / unit.bytes
+-                        NetworkSpeedIcon.Enabled(bytes, unit)
+-                    }
+-                } else {
+-                    flowOf(NetworkSpeedIcon.Disabled)
+-                }
+-            }
+-            .distinctUntilChanged()
+-            .stateIn(
+-                scope = scope,
+-                started = SharingStarted.WhileSubscribed(),
+-                initialValue = NetworkSpeedIcon.Disabled,
+-            )
+-
+-    companion object {
+-        private const val TAG = "NetworkSpeedViewModel"
+-        private const val KB = 1024
+-        private const val MB = KB * 1024
+-        private const val GB = MB * 1024
+-    }
+-}
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/binder/WifiViewBinder.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/binder/WifiViewBinder.kt
+index 0ea47ea940a1..fd93c6bd09b8 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/binder/WifiViewBinder.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/binder/WifiViewBinder.kt
+@@ -29,7 +29,6 @@ import com.android.systemui.lifecycle.repeatWhenAttached
+ import com.android.systemui.res.R
+ import com.android.systemui.statusbar.StatusBarIconView
+ import com.android.systemui.statusbar.StatusBarIconView.STATE_HIDDEN
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.binder.NetworkSpeedViewBinder
+ import com.android.systemui.statusbar.pipeline.shared.ui.binder.ModernStatusBarViewBinding
+ import com.android.systemui.statusbar.pipeline.shared.ui.binder.ModernStatusBarViewVisibilityHelper
+ import com.android.systemui.statusbar.pipeline.shared.ui.binder.StatusBarViewBinderConstants.ALPHA_ACTIVE
+@@ -67,7 +66,6 @@ object WifiViewBinder {
+         val activityContainerView = view.requireViewById<View>(R.id.inout_container)
+         val airplaneSpacer = view.requireViewById<View>(R.id.wifi_airplane_spacer)
+         val signalSpacer = view.requireViewById<View>(R.id.wifi_signal_spacer)
+-        val networkSpeedView = view.requireViewById<ViewGroup>(R.id.network_speed)
+ 
+         view.isVisible = true
+         iconView.isVisible = true
+@@ -182,12 +180,6 @@ object WifiViewBinder {
+             }
+         }
+ 
+-        NetworkSpeedViewBinder.bind(
+-            view = networkSpeedView,
+-            icon = viewModel.networkSpeedIcon,
+-            iconTint = iconTint
+-        )
+-
+         return object : ModernStatusBarViewBinding {
+             override fun getShouldIconBeVisible(): Boolean {
+                 return viewModel.wifiIcon.value is WifiIcon.Visible
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/viewmodel/WifiViewModel.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/viewmodel/WifiViewModel.kt
+index fbd767a35851..fa243da8c00b 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/viewmodel/WifiViewModel.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/viewmodel/WifiViewModel.kt
+@@ -25,8 +25,6 @@ import com.android.systemui.log.table.logDiffsForTable
+ import com.android.systemui.statusbar.pipeline.airplane.ui.viewmodel.AirplaneModeViewModel
+ import com.android.systemui.statusbar.pipeline.dagger.StatusBarPipelineModule.Companion.FIRST_MOBILE_SUB_SHOWING_NETWORK_TYPE_ICON
+ import com.android.systemui.statusbar.pipeline.dagger.WifiTableLog
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.model.NetworkSpeedIcon
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.viewmodel.NetworkSpeedViewModel
+ import com.android.systemui.statusbar.pipeline.shared.ConnectivityConstants
+ import com.android.systemui.statusbar.pipeline.shared.data.model.DataActivityModel
+ import com.android.systemui.statusbar.pipeline.wifi.domain.interactor.WifiInteractor
+@@ -67,7 +65,6 @@ constructor(
+     interactor: WifiInteractor,
+     @Application private val scope: CoroutineScope,
+     wifiConstants: WifiConstants,
+-    networkSpeedViewModel: NetworkSpeedViewModel,
+ ) : WifiViewModelCommon {
+     override val wifiIcon: StateFlow<WifiIcon> =
+         combine(
+@@ -142,6 +139,4 @@ constructor(
+         airplaneModeViewModel.isAirplaneModeIconVisible
+ 
+     override val isSignalSpacerVisible: Flow<Boolean> = shouldShowSignalSpacerProvider.get()
+-
+-    override val networkSpeedIcon: Flow<NetworkSpeedIcon> = networkSpeedViewModel.icon
+ }
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/viewmodel/WifiViewModelCommon.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/viewmodel/WifiViewModelCommon.kt
+index 8159c368c033..617e19200a0a 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/viewmodel/WifiViewModelCommon.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/wifi/ui/viewmodel/WifiViewModelCommon.kt
+@@ -16,7 +16,6 @@
+ 
+ package com.android.systemui.statusbar.pipeline.wifi.ui.viewmodel
+ 
+-import com.android.systemui.statusbar.pipeline.netspeed.ui.model.NetworkSpeedIcon
+ import com.android.systemui.statusbar.pipeline.wifi.ui.model.WifiIcon
+ import kotlinx.coroutines.flow.Flow
+ import kotlinx.coroutines.flow.StateFlow
+@@ -43,7 +42,4 @@ interface WifiViewModelCommon {
+ 
+     /** True if the spacer between the wifi icon and the RAT icon should be visible. */
+     val isSignalSpacerVisible: Flow<Boolean>
+-
+-    /** The network speed indicator that should be displayed. */
+-    val networkSpeedIcon: Flow<NetworkSpeedIcon>
+ }
+-- 
+2.49.0
+
