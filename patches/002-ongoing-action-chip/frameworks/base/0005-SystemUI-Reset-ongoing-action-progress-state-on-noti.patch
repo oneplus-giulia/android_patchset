@@ -1,7 +1,7 @@
-From 5f0e2e7aa8d3da8150866f78f8f263fd7f87714a Mon Sep 17 00:00:00 2001
+From f89539d33c42a1b21459d851f8036686eed3b606 Mon Sep 17 00:00:00 2001
 From: NurKeinNeid <nurkeinneid@derpfest.org>
 Date: Sat, 22 Feb 2025 20:19:04 +0100
-Subject: [PATCH 05/24] SystemUI: Reset ongoing action progress state on
+Subject: [PATCH 05/15] SystemUI: Reset ongoing action progress state on
  notification removal
 
 Change-Id: I9e7bf81c25e5efa8578aefc6f485fc7eb92fc164
@@ -11,7 +11,7 @@ Signed-off-by: NurKeinNeid <nurkeinneid@derpfest.org>
  1 file changed, 5 insertions(+)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
-index 7d3ff60d4..12a0ebbb9 100644
+index 8d74e2583f73..a235cd48588d 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
 @@ -320,5 +320,10 @@ public class OnGoingActionProgressController implements NotificationListener.Not
@@ -26,5 +26,5 @@ index 7d3ff60d4..12a0ebbb9 100644
      }
  }
 -- 
-2.43.0
+2.49.0
 

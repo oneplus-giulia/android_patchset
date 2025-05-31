@@ -1,7 +1,7 @@
-From b3ebe9cbab63f23e952b1b7f57bdb23deaa45706 Mon Sep 17 00:00:00 2001
+From 0476c8d66bedf7c98c5606e911904d5c3c820cb0 Mon Sep 17 00:00:00 2001
 From: f104a <f104a@f104a.io>
 Date: Thu, 16 Jan 2025 15:57:43 +0100
-Subject: [PATCH 03/24] SystemUI: Don't tint progressbar chip icon
+Subject: [PATCH 03/15] SystemUI: Don't tint progressbar chip icon
 
 Change-Id: I5de1ff070e8ced513db5e4867728fcd727e5f511
 ---
@@ -9,7 +9,7 @@ Change-Id: I5de1ff070e8ced513db5e4867728fcd727e5f511
  1 file changed, 3 deletions(-)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/util/IconFetcher.java b/packages/SystemUI/src/com/android/systemui/util/IconFetcher.java
-index 8f4b9a7d1..f99d1ca17 100644
+index 8f4b9a7d1b70..f99d1ca1724e 100644
 --- a/packages/SystemUI/src/com/android/systemui/util/IconFetcher.java
 +++ b/packages/SystemUI/src/com/android/systemui/util/IconFetcher.java
 @@ -69,7 +69,6 @@ public class IconFetcher {
@@ -30,5 +30,5 @@ index 8f4b9a7d1..f99d1ca17 100644
              } else {
                  return new AdaptiveDrawableResult(false, icon);
 -- 
-2.43.0
+2.49.0
 

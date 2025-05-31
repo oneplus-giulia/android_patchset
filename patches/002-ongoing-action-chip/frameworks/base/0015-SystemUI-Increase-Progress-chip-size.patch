@@ -1,7 +1,7 @@
-From cfa346b554e75c0e6b9184e0ea12dfe4fa6b73c7 Mon Sep 17 00:00:00 2001
+From 3f57669fcf505b829d1d988793856ed936cb4168 Mon Sep 17 00:00:00 2001
 From: Ghosuto <clash.raja10@gmail.com>
 Date: Wed, 2 Apr 2025 03:58:56 +0000
-Subject: [PATCH] SystemUI: Increase Progress chip size
+Subject: [PATCH 15/15] SystemUI: Increase Progress chip size
 
 Signed-off-by: Ghosuto <clash.raja10@gmail.com>
 ---
@@ -10,7 +10,7 @@ Signed-off-by: Ghosuto <clash.raja10@gmail.com>
  2 files changed, 22 insertions(+), 15 deletions(-)
 
 diff --git a/packages/SystemUI/res/layout/status_bar_ongoing_action_chip.xml b/packages/SystemUI/res/layout/status_bar_ongoing_action_chip.xml
-index 74aa55a18..508cdd7f4 100644
+index 31890dd3d5de..508cdd7f42b2 100644
 --- a/packages/SystemUI/res/layout/status_bar_ongoing_action_chip.xml
 +++ b/packages/SystemUI/res/layout/status_bar_ongoing_action_chip.xml
 @@ -18,38 +18,38 @@
@@ -20,7 +20,7 @@ index 74aa55a18..508cdd7f4 100644
 -    android:layout_width="65dp"
 -    android:layout_height="20dp"
 -    android:maxWidth="160dp"
--    android:minWidth="80dp"	
+-    android:minWidth="80dp"
 +    android:layout_width="@dimen/ongoing_action_chip_width"
 +    android:layout_height="@dimen/ongoing_action_chip_height"
 +    android:maxWidth="120dp"
@@ -73,7 +73,7 @@ index 74aa55a18..508cdd7f4 100644
 -
  </LinearLayout>
 diff --git a/packages/SystemUI/res/values/dimens.xml b/packages/SystemUI/res/values/dimens.xml
-index 8e682d8bf..c9243b490 100644
+index 8e682d8bf025..c9243b490fcf 100644
 --- a/packages/SystemUI/res/values/dimens.xml
 +++ b/packages/SystemUI/res/values/dimens.xml
 @@ -2114,4 +2114,12 @@
@@ -90,5 +90,5 @@ index 8e682d8bf..c9243b490 100644
 +    <dimen name="ongoing_action_spacing">5dp</dimen>
  </resources>
 -- 
-2.43.0
+2.49.0
 

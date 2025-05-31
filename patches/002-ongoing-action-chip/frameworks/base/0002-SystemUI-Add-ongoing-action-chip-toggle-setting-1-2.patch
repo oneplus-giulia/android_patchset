@@ -1,7 +1,7 @@
-From 7c12e6b852b71486e4f5439b0b993c9e9e0e647f Mon Sep 17 00:00:00 2001
+From 4dcb0d5b142089f03b0f6ea54d05981eb4572cec Mon Sep 17 00:00:00 2001
 From: NurKeinNeid <nurkeinneid@derpfest.org>
 Date: Sat, 22 Feb 2025 16:14:01 +0100
-Subject: [PATCH] SystemUI: Add ongoing action chip toggle setting [1/2]
+Subject: [PATCH 02/15] SystemUI: Add ongoing action chip toggle setting [1/2]
 
 Change-Id: I2083b5184d9a8233722661e42d7d5f33876fc276
 Signed-off-by: NurKeinNeid <nurkeinneid@derpfest.org>
@@ -13,10 +13,10 @@ Signed-off-by: NurKeinNeid <nurkeinneid@derpfest.org>
  4 files changed, 79 insertions(+), 18 deletions(-)
 
 diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
-index 49b9acc94..b72f27359 100644
+index aaf822216279..75884a4cfbfb 100644
 --- a/core/java/android/provider/Settings.java
 +++ b/core/java/android/provider/Settings.java
-@@ -6893,6 +6893,11 @@ public final class Settings {
+@@ -6881,6 +6881,11 @@ public final class Settings {
              PRIVATE_SETTINGS.add(AUTO_BRIGHTNESS_ONE_SHOT);
          }
  
@@ -29,7 +29,7 @@ index 49b9acc94..b72f27359 100644
           * These entries are considered common between the personal and the managed profile,
           * since the managed profile doesn't get to change them.
 diff --git a/packages/SystemUI/res/layout/status_bar_ongoing_action_chip.xml b/packages/SystemUI/res/layout/status_bar_ongoing_action_chip.xml
-index d823da5e2..58997bc7a 100644
+index d823da5e26a8..58997bc7a2ea 100644
 --- a/packages/SystemUI/res/layout/status_bar_ongoing_action_chip.xml
 +++ b/packages/SystemUI/res/layout/status_bar_ongoing_action_chip.xml
 @@ -15,7 +15,9 @@
@@ -44,7 +44,7 @@ index d823da5e2..58997bc7a 100644
      android:layout_height="16sp"
      android:maxWidth="120dp"
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
-index ebf841626..f96016181 100644
+index ebf841626627..b4593a317d11 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
 @@ -17,10 +17,17 @@
@@ -128,13 +128,13 @@ index ebf841626..f96016181 100644
 +        mContentResolver = context.getContentResolver();
 +        mHandler = new Handler(Looper.getMainLooper());
 +        mSettingsObserver = new SettingsObserver(mHandler);
-+        
++
          mProgressBar = progressGroup.progressBarView;
          mProgressRootView = progressGroup.rootView;
          mIconView = progressGroup.iconView;
          mIconFetcher = new IconFetcher(context);
          mNotificationListener.addNotificationHandler(this);
-+        
++
 +        // Register settings observer
 +        mSettingsObserver.register();
      }
@@ -194,7 +194,7 @@ index ebf841626..f96016181 100644
 +    }
  }
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressGroup.java b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressGroup.java
-index 6e86684b2..8542454af 100644
+index 6e86684b2dea..8542454af76c 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressGroup.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressGroup.java
 @@ -27,7 +27,7 @@ public class OnGoingActionProgressGroup {
@@ -207,5 +207,5 @@ index 6e86684b2..8542454af 100644
          this.iconView = iconView;
          this.progressBarView = progressBarView;
 -- 
-2.43.0
+2.49.0
 

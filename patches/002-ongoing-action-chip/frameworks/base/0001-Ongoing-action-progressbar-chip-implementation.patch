@@ -1,7 +1,7 @@
-From d25de6bcb7b6d70021b7fa6e06abe5da5f655aec Mon Sep 17 00:00:00 2001
+From 8e1414f9a2512226edba8986bf3d75364e889b42 Mon Sep 17 00:00:00 2001
 From: Anna-Sophie Kasierocka <hanna.zaitsewa@gmail.com>
 Date: Mon, 6 Jan 2025 21:40:25 +0100
-Subject: [PATCH] Ongoing action progressbar chip implementation
+Subject: [PATCH 01/15] Ongoing action progressbar chip implementation
 
 This commit provides an implementation of a progressbar chip in statusbar which features ongoing action progress from a notification
 The chip is featured to the right of default statusbar clock position, but before the icon container. The contents of chip are miniature app icon and a progress bar
@@ -24,7 +24,7 @@ Change-Id: Ide3ff14927b314d9b988e2c24eba5345fad168aa
  create mode 100644 packages/SystemUI/src/com/android/systemui/util/IconFetcher.java
 
 diff --git a/packages/SystemUI/res/layout/status_bar.xml b/packages/SystemUI/res/layout/status_bar.xml
-index 1f4dea91d..35ee837b9 100644
+index 1f4dea91db01..35ee837b989d 100644
 --- a/packages/SystemUI/res/layout/status_bar.xml
 +++ b/packages/SystemUI/res/layout/status_bar.xml
 @@ -110,6 +110,9 @@
@@ -39,7 +39,7 @@ index 1f4dea91d..35ee837b9 100644
                          android:layout_width="wrap_content"
 diff --git a/packages/SystemUI/res/layout/status_bar_ongoing_action_chip.xml b/packages/SystemUI/res/layout/status_bar_ongoing_action_chip.xml
 new file mode 100644
-index 000000000..d823da5e2
+index 000000000000..d823da5e26a8
 --- /dev/null
 +++ b/packages/SystemUI/res/layout/status_bar_ongoing_action_chip.xml
 @@ -0,0 +1,55 @@
@@ -100,7 +100,7 @@ index 000000000..d823da5e2
 +</LinearLayout>
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
 new file mode 100644
-index 000000000..ebf841626
+index 000000000000..ebf841626627
 --- /dev/null
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
 @@ -0,0 +1,241 @@
@@ -347,7 +347,7 @@ index 000000000..ebf841626
 +}
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressGroup.java b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressGroup.java
 new file mode 100644
-index 000000000..6e86684b2
+index 000000000000..6e86684b2dea
 --- /dev/null
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressGroup.java
 @@ -0,0 +1,35 @@
@@ -388,7 +388,7 @@ index 000000000..6e86684b2
 +}
 \ No newline at end of file
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
-index b27e6b4c4..444e49b47 100644
+index cb61f1fecd5d..027a4c77d6b9 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
 @@ -189,12 +189,14 @@ import com.android.systemui.statusbar.KeyguardIndicationController;
@@ -430,7 +430,7 @@ index b27e6b4c4..444e49b47 100644
          }
          if (!StatusBarRootModernization.isEnabled() && !StatusBarConnectedDisplays.isEnabled()) {
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarViewController.kt b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarViewController.kt
-index f19d70704..fb973fb06 100644
+index f19d707046f1..fb973fb06211 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarViewController.kt
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/PhoneStatusBarViewController.kt
 @@ -23,6 +23,8 @@ import android.view.MotionEvent
@@ -467,7 +467,7 @@ index f19d70704..fb973fb06 100644
          darkIconDispatcher.addDarkReceiver(clock)
 diff --git a/packages/SystemUI/src/com/android/systemui/util/IconFetcher.java b/packages/SystemUI/src/com/android/systemui/util/IconFetcher.java
 new file mode 100644
-index 000000000..8f4b9a7d1
+index 000000000000..8f4b9a7d1b70
 --- /dev/null
 +++ b/packages/SystemUI/src/com/android/systemui/util/IconFetcher.java
 @@ -0,0 +1,95 @@
@@ -567,5 +567,5 @@ index 000000000..8f4b9a7d1
 +    }
 +}
 -- 
-2.43.0
+2.49.0
 

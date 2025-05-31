@@ -1,7 +1,8 @@
-From b6c1ea897d7169c86932711785a74c0e93187c46 Mon Sep 17 00:00:00 2001
+From 27746ed71454e107cb0fec9509cc54396f48f18d Mon Sep 17 00:00:00 2001
 From: f104a <f104a@f104a.io>
 Date: Thu, 27 Feb 2025 16:17:47 +0100
-Subject: [PATCH] SystemUI: Hide ongoing action progress chip on lockscreen
+Subject: [PATCH 04/15] SystemUI: Hide ongoing action progress chip on
+ lockscreen
 
 Change-Id: Iace5817e4c3111d23a1c38c0707e4822ce8fd93c
 ---
@@ -10,7 +11,7 @@ Change-Id: Iace5817e4c3111d23a1c38c0707e4822ce8fd93c
  2 files changed, 36 insertions(+), 6 deletions(-)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
-index f96016181..7d3ff60d4 100644
+index b4593a317d11..8d74e2583f73 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
 @@ -39,9 +39,10 @@ import android.widget.ProgressBar;
@@ -107,7 +108,7 @@ index f96016181..7d3ff60d4 100644
          mIsEnabled = Settings.System.getIntForUser(mContentResolver,
              ONGOING_ACTION_CHIP_ENABLED, 1, UserHandle.USER_CURRENT) == 1;
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java b/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
-index 444e49b47..e85119272 100644
+index 027a4c77d6b9..634608732696 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/phone/CentralSurfacesImpl.java
 @@ -293,6 +293,7 @@ public class CentralSurfacesImpl implements CoreStartable, CentralSurfaces {
@@ -134,5 +135,5 @@ index 444e49b47..e85119272 100644
          }
          if (!StatusBarRootModernization.isEnabled() && !StatusBarConnectedDisplays.isEnabled()) {
 -- 
-2.43.0
+2.49.0
 

@@ -1,19 +1,19 @@
-From 846b9ed173b86f6c96d407ab2d8c3da584b56b21 Mon Sep 17 00:00:00 2001
+From 1b22b422feb7609f4cb1689c7db4a282d30600a5 Mon Sep 17 00:00:00 2001
 From: Ghosuto <clash.raja10@gmail.com>
 Date: Sun, 23 Mar 2025 04:51:29 +0000
-Subject: [PATCH 13/24] SystemUI: Add ripple effect to overlay action container
+Subject: [PATCH 11/15] SystemUI: Add ripple effect to overlay action container
  background
 
 ---
- .../action_chip_container_background.xml       | 18 ++++++++++++------
- .../res/drawable/ripple_chip_background.xml    |  2 +-
- 2 files changed, 13 insertions(+), 7 deletions(-)
+ .../action_chip_container_background.xml        | 17 +++++++++++------
+ .../res/drawable/ripple_chip_background.xml     |  2 +-
+ 2 files changed, 12 insertions(+), 7 deletions(-)
 
 diff --git a/packages/SystemUI/res/drawable/action_chip_container_background.xml b/packages/SystemUI/res/drawable/action_chip_container_background.xml
-index 2ee27107d..331a721d9 100644
+index 2ee27107d900..a4587fb2934e 100644
 --- a/packages/SystemUI/res/drawable/action_chip_container_background.xml
 +++ b/packages/SystemUI/res/drawable/action_chip_container_background.xml
-@@ -14,10 +14,16 @@
+@@ -14,10 +14,15 @@
    ~ See the License for the specific language governing permissions and
    ~ limitations under the License.
    -->
@@ -26,7 +26,7 @@ index 2ee27107d..331a721d9 100644
 -    <corners android:radius="@dimen/overlay_action_container_corner_radius"/>
 -</shape>
 +    android:color="?android:attr/colorControlHighlight">
-+    
++
 +    <item>
 +        <shape android:shape="rectangle">
 +            <solid android:color="?androidprv:attr/materialColorSurfaceBright"/>
@@ -35,9 +35,8 @@ index 2ee27107d..331a721d9 100644
 +    </item>
 +
 +</ripple>
-+
 diff --git a/packages/SystemUI/res/drawable/ripple_chip_background.xml b/packages/SystemUI/res/drawable/ripple_chip_background.xml
-index d9db3736b..e37e09b74 100644
+index d9db3736b1dd..e37e09b74ab5 100644
 --- a/packages/SystemUI/res/drawable/ripple_chip_background.xml
 +++ b/packages/SystemUI/res/drawable/ripple_chip_background.xml
 @@ -19,7 +19,7 @@
@@ -50,5 +49,5 @@ index d9db3736b..e37e09b74 100644
      </item>
  </ripple>
 -- 
-2.43.0
+2.49.0
 

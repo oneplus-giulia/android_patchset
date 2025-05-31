@@ -1,7 +1,7 @@
-From b4e368d955da718c1b259fcbc990b0fb4bb5c462 Mon Sep 17 00:00:00 2001
+From fcbfc0b098d9428ec8b49eb401a32eceaeeb6625 Mon Sep 17 00:00:00 2001
 From: NurKeinNeid <nurkeinneid@derpfest.org>
 Date: Mon, 3 Mar 2025 01:28:10 +0100
-Subject: [PATCH 09/24] OnGoingActionProgressController: Improve logging for
+Subject: [PATCH 09/15] OnGoingActionProgressController: Improve logging for
  progress tracking
 
 Change-Id: Ie30ec64579f479d3c62e4c01966d50cc5db17e66
@@ -11,7 +11,7 @@ Signed-off-by: NurKeinNeid <nurkeinneid@derpfest.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
-index 24ae67fb1..22b9423a6 100644
+index a339c1938fa8..4a6df739b8ee 100644
 --- a/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
 +++ b/packages/SystemUI/src/com/android/systemui/statusbar/OnGoingActionProgressController.java
 @@ -207,8 +207,8 @@ public class OnGoingActionProgressController implements NotificationListener.Not
@@ -26,5 +26,5 @@ index 24ae67fb1..22b9423a6 100644
          }
          Log.d(TAG, "updateViews: " + mCurrentProgress + "/" + mCurrentProgressMax);
 -- 
-2.43.0
+2.49.0
 
