@@ -1,0 +1,64 @@
+From 4be31fb700e4be8cabb93c58d7b776a10d3ed7b5 Mon Sep 17 00:00:00 2001
+From: pexcn <pexcn97@gmail.com>
+Date: Mon, 9 Jun 2025 20:42:47 +0800
+Subject: [PATCH] Settings: Volume Rocker Wake [2/2]
+
+Change-Id: Id5a2e5dd06dca19ee9b1e4f6a9719bb787eb9d5c
+---
+ res/values-zh-rCN/custom_strings.xml | 3 +++
+ res/values/custom_strings.xml        | 4 ++++
+ res/xml/gestures.xml                 | 8 ++++++++
+ 3 files changed, 15 insertions(+)
+
+diff --git a/res/values-zh-rCN/custom_strings.xml b/res/values-zh-rCN/custom_strings.xml
+index 735091cfae1..bc48524d7e0 100644
+--- a/res/values-zh-rCN/custom_strings.xml
++++ b/res/values-zh-rCN/custom_strings.xml
+@@ -270,4 +270,7 @@
+     <!-- Ongoing action chip -->
+     <string name="ongoing_action_chip_title">通知进度条</string>
+     <string name="ongoing_action_chip_summary">在状态栏中显示通知进度条</string>
++    <!-- Volume rocker wake -->
++    <string name="volume_rocker_wake_title">音量键唤醒</string>
++    <string name="volume_rocker_wake_summary">按下音量键唤醒您的设备</string>
+ </resources>
+diff --git a/res/values/custom_strings.xml b/res/values/custom_strings.xml
+index 969ea610ddc..54862427351 100644
+--- a/res/values/custom_strings.xml
++++ b/res/values/custom_strings.xml
+@@ -320,4 +320,8 @@
+     <string name="ongoing_action_chip_title">Enable Ongoing ProgressBar Chip</string>
+     <string name="ongoing_action_chip_summary">Show progressbar chip in statusbar which features ongoing action progress from a notification</string>
+ 
++    <!-- Volume rocker wake -->
++    <string name="volume_rocker_wake_title">Volume wake</string>
++    <string name="volume_rocker_wake_summary">Wake your device up by pressing the volume keys</string>
++
+ </resources>
+diff --git a/res/xml/gestures.xml b/res/xml/gestures.xml
+index 06eeb880a75..c0d67a75a97 100644
+--- a/res/xml/gestures.xml
++++ b/res/xml/gestures.xml
+@@ -98,6 +98,7 @@
+         android:key="power_button_torch_summary"
+         android:title="@string/power_button_torch_title"
+         android:fragment="com.android.settings.gestures.PowerButtonTorchSettings"
++        android:dependency="volume_rocker_wake"
+         settings:controller="com.android.settings.gestures.PowerButtonTorchGesturePreferenceController" />
+ 
+     <Preference
+@@ -131,4 +132,11 @@
+             settings:requiresAction="org.lineageos.settings.device.GESTURE_SETTINGS">
+         <intent android:action="org.lineageos.settings.device.GESTURE_SETTINGS" />
+     </com.android.settings.custom.preference.RemotePreference>
++
++    <com.android.settings.custom.preference.SystemSettingSwitchPreference
++        android:key="volume_rocker_wake"
++        android:title="@string/volume_rocker_wake_title"
++        android:summary="@string/volume_rocker_wake_summary"
++        android:defaultValue="false"
++        android:disableDependentsState="true" />
+ </PreferenceScreen>
+-- 
+2.49.0
+
