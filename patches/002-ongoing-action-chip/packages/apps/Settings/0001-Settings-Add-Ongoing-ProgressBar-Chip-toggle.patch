@@ -1,59 +1,55 @@
-From 82c92733db1b55d936ad54a39c294b14bcabe41d Mon Sep 17 00:00:00 2001
+From 85088fcff67e49606f72cb8dc5bcaaec8ffc0a4e Mon Sep 17 00:00:00 2001
 From: pexcn <pexcn97@gmail.com>
-Date: Wed, 21 May 2025 09:26:03 +0000
+Date: Tue, 10 Jun 2025 11:48:47 +0800
 Subject: [PATCH] Settings: Add Ongoing ProgressBar Chip toggle
 
 ref: https://github.com/ProjectMatrixx/android_packages_apps_MatrixxSettings/commit/dc44266b655c76b7320fd48da22cebdefcc53480
-Signed-off-by: pexcn <pexcn97@gmail.com>
 ---
- res/values-zh-rCN/custom_strings.xml        | 3 +++
- res/values/custom_strings.xml               | 4 ++++
- res/xml/configure_notification_settings.xml | 7 +++++++
- 3 files changed, 14 insertions(+)
+ res/values-zh-rCN/custom_strings.xml | 3 +++
+ res/values/custom_strings.xml        | 4 ++++
+ res/xml/enhance_settings.xml         | 6 ++++++
+ 3 files changed, 13 insertions(+)
 
 diff --git a/res/values-zh-rCN/custom_strings.xml b/res/values-zh-rCN/custom_strings.xml
-index c2ea41036c8..735091cfae1 100644
+index a2eb6ff..7e2b163 100644
 --- a/res/values-zh-rCN/custom_strings.xml
 +++ b/res/values-zh-rCN/custom_strings.xml
-@@ -267,4 +267,7 @@
-     <!-- Access QS on lockscreen -->
-     <string name="show_qs_on_secure_keyguard_title">快速设置</string>
-     <string name="show_qs_on_secure_keyguard_summary">允许在锁屏界面使用快速设置</string>
+@@ -273,4 +273,7 @@
+     <!-- Volume rocker wake -->
+     <string name="volume_rocker_wake_title">音量键唤醒</string>
+     <string name="volume_rocker_wake_summary">按下音量键唤醒您的设备</string>
 +    <!-- Ongoing action chip -->
 +    <string name="ongoing_action_chip_title">通知进度条</string>
 +    <string name="ongoing_action_chip_summary">在状态栏中显示通知进度条</string>
  </resources>
 diff --git a/res/values/custom_strings.xml b/res/values/custom_strings.xml
-index 4dbf6d5a4ea..42d7bbcf708 100644
+index 393e2f7..88a9ef2 100644
 --- a/res/values/custom_strings.xml
 +++ b/res/values/custom_strings.xml
-@@ -307,4 +307,8 @@
-     <string name="show_qs_on_secure_keyguard_title">Quick settings</string>
-     <string name="show_qs_on_secure_keyguard_summary">Allow toggling quick settings on secure lockscreen</string>
+@@ -315,4 +315,8 @@
+     <string name="volume_rocker_wake_title">Volume wake</string>
+     <string name="volume_rocker_wake_summary">Wake your device up by pressing the volume keys</string>
  
 +    <!-- Ongoing action chip -->
 +    <string name="ongoing_action_chip_title">Enable Ongoing ProgressBar Chip</string>
 +    <string name="ongoing_action_chip_summary">Show progressbar chip in statusbar which features ongoing action progress from a notification</string>
 +
  </resources>
-diff --git a/res/xml/configure_notification_settings.xml b/res/xml/configure_notification_settings.xml
-index 92ae1aab23d..fdc54bcccc4 100644
---- a/res/xml/configure_notification_settings.xml
-+++ b/res/xml/configure_notification_settings.xml
-@@ -220,6 +220,13 @@
-             android:summary="@string/notification_assistant_summary"
-             settings:controller="com.android.settings.notification.NotificationAssistantPreferenceController"/>
+diff --git a/res/xml/enhance_settings.xml b/res/xml/enhance_settings.xml
+index 1edcc8c..6f8f74f 100644
+--- a/res/xml/enhance_settings.xml
++++ b/res/xml/enhance_settings.xml
+@@ -26,4 +26,10 @@
+         android:defaultValue="false"
+         android:disableDependentsState="true" />
  
-+        <com.android.settings.custom.preference.SystemSettingSwitchPreference
-+            android:key="ongoing_action_chip"
-+            android:order="29"
-+            android:title="@string/ongoing_action_chip_title"
-+            android:summary="@string/ongoing_action_chip_summary"
-+            android:defaultValue="true"/>
++    <com.android.settings.custom.preference.SystemSettingSwitchPreference
++        android:key="ongoing_action_chip"
++        android:title="@string/ongoing_action_chip_title"
++        android:summary="@string/ongoing_action_chip_summary"
++        android:defaultValue="true" />
 +
-         <!-- Heads up -->
-         <com.android.settings.custom.preference.GlobalSettingSwitchPreference
-             android:key="heads_up_notifications_enabled"
+ </PreferenceScreen>
 -- 
-2.49.0
+2.45.2
 
