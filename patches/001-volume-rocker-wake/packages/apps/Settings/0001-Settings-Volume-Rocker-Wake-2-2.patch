@@ -9,11 +9,10 @@ Change-Id: Id5a2e5dd06dca19ee9b1e4f6a9719bb787eb9d5c
  res/values-zh-rCN/custom_strings.xml          |  6 +++
  res/values/custom_strings.xml                 |  8 ++++
  res/xml/enhance_settings.xml                  | 29 ++++++++++++++
- res/xml/gestures.xml                          |  1 +
  res/xml/system_dashboard_fragment.xml         |  9 +++++
  .../enhance/EnhancePreferenceController.java  | 33 +++++++++++++++
  .../settings/enhance/EnhanceSettings.java     | 40 +++++++++++++++++++
- 8 files changed, 136 insertions(+)
+ 7 files changed, 135 insertions(+)
  create mode 100644 res/drawable/ic_settings_enhance.xml
  create mode 100644 res/xml/enhance_settings.xml
  create mode 100644 src/com/android/settings/enhance/EnhancePreferenceController.java
@@ -102,18 +101,6 @@ index 0000000..1edcc8c
 +        android:disableDependentsState="true" />
 +
 +</PreferenceScreen>
-diff --git a/res/xml/gestures.xml b/res/xml/gestures.xml
-index 06eeb88..9f6f325 100644
---- a/res/xml/gestures.xml
-+++ b/res/xml/gestures.xml
-@@ -104,6 +104,7 @@
-         android:key="volume_button_music_control_sumary"
-         android:title="@string/volume_button_music_control_title"
-         android:fragment="com.android.settings.gestures.VolumeButtonMusicControlGestureSettings"
-+        android:dependency="volume_rocker_wake"
-         settings:controller="com.android.settings.gestures.VolumeButtonMusicControlPreferenceController" />
- 
-     <com.android.settingslib.PrimarySwitchPreference
 diff --git a/res/xml/system_dashboard_fragment.xml b/res/xml/system_dashboard_fragment.xml
 index 83cdf64..7822858 100644
 --- a/res/xml/system_dashboard_fragment.xml
