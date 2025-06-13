@@ -27,7 +27,7 @@ apply_patches() {
 
     cd "$target_dir"
     git am "$patch_file" || {
-      echo "Failed to apply $patch_file"
+      echo "Failed to apply $patch_path"
       exit 1
     }
     cd - >/dev/null
