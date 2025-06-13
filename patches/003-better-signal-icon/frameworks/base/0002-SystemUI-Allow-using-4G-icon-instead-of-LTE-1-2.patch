@@ -1,0 +1,187 @@
+From 491449e9b98202999a4319e6bebcb58447286703 Mon Sep 17 00:00:00 2001
+From: Pranav Vashi <neobuddy89@gmail.com>
+Date: Wed, 19 Jul 2017 23:46:45 +0530
+Subject: [PATCH] SystemUI: Allow using 4G icon instead of LTE [1/2]
+
+[someone5678] Adapt to SystemUI mobile connections pipeline
+
+Change-Id: Ieb912c64a60ddd42fe7b21d18dadea293ff159c5
+Signed-off-by: someone5678 <someone5678@users.noreply.github.com>
+Signed-off-by: Pranav Vashi <neobuddy89@gmail.com>
+---
+ core/java/android/provider/Settings.java      |  6 +++
+ .../connectivity/MobileSignalController.java  |  8 ++++
+ .../domain/interactor/MobileIconInteractor.kt | 26 +++++++++++
+ .../ui/viewmodel/MobileIconViewModel.kt       | 43 ++++++++++++++++---
+ 4 files changed, 78 insertions(+), 5 deletions(-)
+
+diff --git a/core/java/android/provider/Settings.java b/core/java/android/provider/Settings.java
+index 2efc6aebd6fe..85c9484b06ab 100644
+--- a/core/java/android/provider/Settings.java
++++ b/core/java/android/provider/Settings.java
+@@ -6700,6 +6700,12 @@ public final class Settings {
+          */
+         public static final String DATA_DISABLED_ICON = "data_disabled_icon";
+ 
++        /**
++         * Whether to display 4G icon instead LTE
++         * @hide
++         */
++        public static final String SHOW_FOURG_ICON = "show_fourg_icon";
++
+         /**
+          * Whether to show advanced reboot options in power menu
+          * @hide
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/MobileSignalController.java b/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/MobileSignalController.java
+index 0aa5ed6e7138..b495657560c6 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/MobileSignalController.java
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/connectivity/MobileSignalController.java
+@@ -76,6 +76,8 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
+ 
+     private static final String DATA_DISABLED_ICON =
+             "system:" + Settings.System.DATA_DISABLED_ICON;
++    private static final String SHOW_FOURG_ICON =
++            "system:" + Settings.System.SHOW_FOURG_ICON;
+ 
+     private boolean mDataDisabledIcon;
+ 
+@@ -169,6 +171,7 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
+         mMobileStatusTracker = mobileStatusTrackerFactory.createTracker(mMobileCallback);
+ 
+         Dependency.get(TunerService.class).addTunable(this, DATA_DISABLED_ICON);
++        Dependency.get(TunerService.class).addTunable(this, SHOW_FOURG_ICON);
+     }
+ 
+     @Override
+@@ -179,6 +182,11 @@ public class MobileSignalController extends SignalController<MobileState, Mobile
+                     TunerService.parseIntegerSwitch(newValue, true);
+                 updateTelephony();
+                 break;
++            case SHOW_FOURG_ICON:
++                mConfig = Config.readConfig(mContext);
++                setConfiguration(mConfig);
++                notifyListeners();
++                break;
+             default:
+                 break;
+         }
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/domain/interactor/MobileIconInteractor.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/domain/interactor/MobileIconInteractor.kt
+index 2994a469f438..44484d808ae3 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/domain/interactor/MobileIconInteractor.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/domain/interactor/MobileIconInteractor.kt
+@@ -136,6 +136,8 @@ interface MobileIconInteractor {
+ 
+     /** True when in carrier network change mode */
+     val carrierNetworkChangeActive: StateFlow<Boolean>
++
++    val shouldShowFourgIcon: StateFlow<Boolean>
+ }
+ 
+ /** Interactor for a single mobile connection. This connection _should_ have one subscription ID */
+@@ -189,6 +191,30 @@ class MobileIconInteractorImpl(
+                 true
+             )
+ 
++    private final val SHOW_FOURG_ICON: String =
++            "system:" + Settings.System.SHOW_FOURG_ICON;
++
++    override val shouldShowFourgIcon: StateFlow<Boolean> =
++        conflatedCallbackFlow {
++                val callback =
++                    object : TunerService.Tunable {
++                        override fun onTuningChanged(key: String, newValue: String?) {
++                            when (key) {
++                                SHOW_FOURG_ICON ->
++                                    trySend(TunerService.parseIntegerSwitch(newValue, false))
++                            }
++                        }
++                    }
++                Dependency.get(TunerService::class.java).addTunable(callback, SHOW_FOURG_ICON)
++
++                awaitClose { Dependency.get(TunerService::class.java).removeTunable(callback) }
++            }
++            .stateIn(
++                scope,
++                started = SharingStarted.WhileSubscribed(),
++                true
++            )
++
+     // True if there exists _any_ icon override for this carrierId. Note that overrides can include
+     // any or none of the icon groups defined in MobileMappings, so we still need to check on a
+     // per-network-type basis whether or not the given icon group is overridden
+diff --git a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconViewModel.kt b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconViewModel.kt
+index e8997258b208..3accf5ca0020 100644
+--- a/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconViewModel.kt
++++ b/packages/SystemUI/src/com/android/systemui/statusbar/pipeline/mobile/ui/viewmodel/MobileIconViewModel.kt
+@@ -17,6 +17,7 @@
+ package com.android.systemui.statusbar.pipeline.mobile.ui.viewmodel
+ 
+ import com.android.settingslib.AccessibilityContentDescriptions
++import com.android.settingslib.mobile.TelephonyIcons
+ import com.android.systemui.Flags.statusBarStaticInoutIndicators
+ import com.android.systemui.common.shared.model.ContentDescription
+ import com.android.systemui.common.shared.model.Icon
+@@ -261,23 +262,55 @@ private class CellularIconViewModel(
+         combine(
+                 iconInteractor.networkTypeIconGroup,
+                 showNetworkTypeIcon,
+-            ) { networkTypeIconGroup, shouldShow ->
++                iconInteractor.shouldShowFourgIcon,
++            ) { networkTypeIconGroup, shouldShow, shouldShowFourgIcon ->
+                 val desc =
+-                    if (networkTypeIconGroup.contentDescription != 0)
+-                        ContentDescription.Resource(networkTypeIconGroup.contentDescription)
++                    if (networkTypeIconGroup.contentDescription != 0) {
++                        var contDesc: Int = networkTypeIconGroup.contentDescription
++                        if (shouldShowFourgIcon) contDesc = convertLteToFourg(contDesc)
++                        ContentDescription.Resource(contDesc)
++                    }
+                     else null
+                 val icon =
+-                    if (networkTypeIconGroup.iconId != 0)
+-                        Icon.Resource(networkTypeIconGroup.iconId, desc)
++                    if (networkTypeIconGroup.iconId != 0) {
++                        var contIcon: Int = networkTypeIconGroup.iconId
++                        if (shouldShowFourgIcon) contIcon = convertLteToFourg(contIcon)
++                        Icon.Resource(contIcon, desc)
++                    }
+                     else null
+                 return@combine when {
+                     !shouldShow -> null
++                    shouldShowFourgIcon ||
++                    !shouldShowFourgIcon -> icon
+                     else -> icon
+                 }
+             }
+             .distinctUntilChanged()
+             .stateIn(scope, SharingStarted.WhileSubscribed(), null)
+ 
++    private fun convertLteToFourg(res: Int): Int {
++        when (res) {
++            com.android.settingslib.R.string.data_connection_lte,
++            com.android.settingslib.R.string.data_connection_4g_lte -> {
++                return com.android.settingslib.R.string.data_connection_4g as Int
++            }
++            com.android.settingslib.R.string.data_connection_lte_plus,
++            com.android.settingslib.R.string.data_connection_4g_lte_plus -> {
++                return com.android.settingslib.R.string.data_connection_4g_plus as Int
++            }
++            TelephonyIcons.ICON_LTE,
++            TelephonyIcons.ICON_4G_LTE -> {
++                return TelephonyIcons.ICON_4G as Int
++            }
++            TelephonyIcons.ICON_LTE_PLUS,
++            TelephonyIcons.ICON_4G_LTE_PLUS -> {
++                return TelephonyIcons.ICON_4G_PLUS as Int
++            }
++            else -> {}
++        }
++        return res
++    }
++
+     override val networkTypeBackground =
+         if (!flags.isEnabled(NEW_NETWORK_SLICE_UI)) {
+                 flowOf(null)
+-- 
+2.49.0
+
