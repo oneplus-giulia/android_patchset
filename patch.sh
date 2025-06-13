@@ -27,7 +27,7 @@ apply_patches() {
 
     echo "Applying $patch_file to $target_dir"
     cd "$target_dir"
-    patch --no-backup-if-mismatch --batch -p1 < "$patch_file" || {
+    git am "$patch_file" || {
       echo "Failed to apply $patch_file"
       exit 1
     }
