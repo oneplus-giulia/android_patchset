@@ -1,0 +1,146 @@
+From e0e813fca8e396dbbc189478709cbd9001c0a590 Mon Sep 17 00:00:00 2001
+From: Ido Ben-Hur <idoybh2@gmail.com>
+Date: Tue, 22 Oct 2024 00:07:22 +0300
+Subject: [PATCH] SystemUI: Improve the new biometric prompt layout
+
+* App label should be centered
+* Corners should be way less round
+* Buttons should be lower and closer together
+* Status text should be closer to the udfps icon
+
+This would still clash buttons with the status text on a very low udfps
+Also landscape layout is still VERY bad - Wait for AOSP to fix it as it seems they're using the multi screen layout for everyone on landscape by mistake
+---
+ .../res/layout/biometric_prompt_button_bar.xml  | 17 ++++++-----------
+ .../layout/biometric_prompt_one_pane_layout.xml |  9 +++++----
+ packages/SystemUI/res/values/dimens.xml         |  6 +++---
+ 3 files changed, 14 insertions(+), 18 deletions(-)
+
+diff --git a/packages/SystemUI/res/layout/biometric_prompt_button_bar.xml b/packages/SystemUI/res/layout/biometric_prompt_button_bar.xml
+index ce205ca565491..238fba6c76540 100644
+--- a/packages/SystemUI/res/layout/biometric_prompt_button_bar.xml
++++ b/packages/SystemUI/res/layout/biometric_prompt_button_bar.xml
+@@ -27,8 +27,7 @@
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center_vertical"
+-        android:layout_marginStart="24dp"
+-        android:layout_marginBottom="8dp"
++        android:layout_marginStart="4dp"
+         android:visibility="invisible"
+         app:layout_constrainedWidth="true"
+         app:layout_constraintBottom_toBottomOf="parent"
+@@ -43,8 +42,7 @@
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center_vertical"
+-        android:layout_marginStart="24dp"
+-        android:layout_marginBottom="8dp"
++        android:layout_marginStart="4dp"
+         android:text="@string/cancel"
+         android:visibility="invisible"
+         app:layout_constrainedWidth="true"
+@@ -60,8 +58,7 @@
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center_vertical"
+-        android:layout_marginStart="24dp"
+-        android:layout_marginBottom="8dp"
++        android:layout_marginStart="4dp"
+         android:visibility="invisible"
+         app:layout_constrainedWidth="true"
+         app:layout_constraintBottom_toBottomOf="parent"
+@@ -76,8 +73,7 @@
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center_vertical"
+-        android:layout_marginEnd="24dp"
+-        android:layout_marginBottom="8dp"
++        android:layout_marginEnd="4dp"
+         android:text="@string/biometric_dialog_confirm"
+         android:visibility="invisible"
+         app:layout_constrainedWidth="true"
+@@ -93,8 +89,7 @@
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_gravity="center_vertical"
+-        android:layout_marginEnd="24dp"
+-        android:layout_marginBottom="8dp"
++        android:layout_marginEnd="4dp"
+         android:text="@string/biometric_dialog_try_again"
+         android:visibility="invisible"
+         app:layout_constrainedWidth="true"
+@@ -108,6 +103,6 @@
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:orientation="vertical"
+-        app:layout_constraintGuide_percent="0.5" />
++        app:layout_constraintGuide_percent="0.2" />
+ 
+ </androidx.constraintlayout.widget.ConstraintLayout>
+diff --git a/packages/SystemUI/res/layout/biometric_prompt_one_pane_layout.xml b/packages/SystemUI/res/layout/biometric_prompt_one_pane_layout.xml
+index 91cd019c85d1d..98f1fda4ae575 100644
+--- a/packages/SystemUI/res/layout/biometric_prompt_one_pane_layout.xml
++++ b/packages/SystemUI/res/layout/biometric_prompt_one_pane_layout.xml
+@@ -75,8 +75,9 @@
+             <TextView
+                 android:id="@+id/logo_description"
+                 style="@style/TextAppearance.AuthCredential.LogoDescription"
+-                android:layout_width="match_parent"
++                android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
++                android:gravity="@integer/biometric_dialog_text_gravity"
+                 android:paddingTop="@dimen/biometric_prompt_logo_description_top_padding"
+                 app:layout_constraintBottom_toTopOf="@+id/title"
+                 app:layout_constraintEnd_toEndOf="parent"
+@@ -101,7 +102,7 @@
+                 android:layout_width="wrap_content"
+                 android:layout_height="wrap_content"
+                 android:gravity="@integer/biometric_dialog_text_gravity"
+-                android:paddingTop="16dp"
++                android:paddingTop="8dp"
+                 app:layout_constraintBottom_toTopOf="@+id/contentBarrier"
+                 app:layout_constraintEnd_toEndOf="parent"
+                 app:layout_constraintStart_toStartOf="parent"
+@@ -149,7 +150,7 @@
+         style="@style/TextAppearance.AuthCredential.Indicator"
+         android:layout_width="0dp"
+         android:layout_height="wrap_content"
+-        android:layout_marginTop="24dp"
++        android:layout_marginTop="8dp"
+         android:layout_marginHorizontal="24dp"
+         android:accessibilityLiveRegion="assertive"
+         android:fadingEdge="horizontal"
+@@ -196,7 +197,7 @@
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:orientation="horizontal"
+-        app:layout_constraintGuide_end="40dp" />
++        app:layout_constraintGuide_end="10dp" />
+ 
+     <androidx.constraintlayout.widget.Guideline
+         android:id="@+id/topGuideline"
+diff --git a/packages/SystemUI/res/values/dimens.xml b/packages/SystemUI/res/values/dimens.xml
+index e9ee1e809e1ee..ba92a8a1d7e9e 100644
+--- a/packages/SystemUI/res/values/dimens.xml
++++ b/packages/SystemUI/res/values/dimens.xml
+@@ -1137,7 +1137,7 @@
+     <dimen name="biometric_dialog_fingerprint_icon_height">100dp</dimen>
+     <dimen name="biometric_dialog_button_negative_max_width">160dp</dimen>
+     <dimen name="biometric_dialog_button_positive_max_width">136dp</dimen>
+-    <dimen name="biometric_dialog_corner_size">28dp</dimen>
++    <dimen name="biometric_dialog_corner_size">@*android:dimen/rounded_corner_radius</dimen>
+     <dimen name="biometric_dialog_indicator_max_width">280dp</dimen>
+     <!-- Y translation when showing/dismissing the dialog-->
+     <dimen name="biometric_dialog_animation_translation_offset">350dp</dimen>
+@@ -1162,8 +1162,8 @@
+     <dimen name="biometric_prompt_one_pane_medium_horizontal_guideline_padding">0dp</dimen>
+ 
+     <!-- Dimensions for biometric prompt scroll view padding -->
+-    <dimen name="biometric_prompt_top_scroll_view_bottom_padding">24dp</dimen>
+-    <dimen name="biometric_prompt_top_scroll_view_horizontal_padding">24dp</dimen>
++    <dimen name="biometric_prompt_top_scroll_view_bottom_padding">16dp</dimen>
++    <dimen name="biometric_prompt_top_scroll_view_horizontal_padding">16dp</dimen>
+ 
+     <!-- Dimensions for biometric prompt icon padding -->
+     <dimen name="biometric_prompt_portrait_small_bottom_padding">60dp</dimen>
