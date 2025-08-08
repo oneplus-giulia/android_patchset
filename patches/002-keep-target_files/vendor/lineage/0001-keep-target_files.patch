@@ -1,0 +1,24 @@
+From e99b99efb4f0136205c3985bf7efc607444339db Mon Sep 17 00:00:00 2001
+From: pexcn <pexcn97@gmail.com>
+Date: Fri, 8 Aug 2025 21:47:38 +0800
+Subject: [PATCH] keep target_files
+
+---
+ build/tasks/evolution.mk | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/build/tasks/evolution.mk b/build/tasks/evolution.mk
+index 939f7ed..8373a13 100644
+--- a/build/tasks/evolution.mk
++++ b/build/tasks/evolution.mk
+@@ -24,7 +24,6 @@ $(LINEAGE_TARGET_PACKAGE): $(INTERNAL_OTA_PACKAGE_TARGET)
+ 	$(hide) mv -f $(INTERNAL_OTA_PACKAGE_TARGET) $(LINEAGE_TARGET_PACKAGE)
+ 	$(hide) $(SHA256) $(LINEAGE_TARGET_PACKAGE) | sed "s|$(PRODUCT_OUT)/||" > $(LINEAGE_TARGET_PACKAGE).sha256sum
+ 	$(hide) ./vendor/lineage/build/tools/createjson.py $(TARGET_DEVICE) $(PRODUCT_OUT) $(LINEAGE_VERSION).zip $(TARGET_BUILD_VARIANT) $(WITH_GMS)
+-	$(hide) rm -rf $(call intermediates-dir-for,PACKAGING,target_files)
+ 	$(hide) ./vendor/lineage/build/tasks/ascii_output.sh
+ 	@echo "Package Complete: $(LINEAGE_TARGET_PACKAGE)" >&2
+ 
+-- 
+2.49.0
+
