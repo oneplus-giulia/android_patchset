@@ -1,0 +1,25 @@
+From 7f24da93bc5e2fa66df19732497909f697a9e7a0 Mon Sep 17 00:00:00 2001
+From: pexcn <pexcn97@gmail.com>
+Date: Tue, 30 Sep 2025 23:30:02 +0800
+Subject: [PATCH 1/2] Revert "config: Spoof BuildFingerprint as Pixel Beta"
+
+This reverts commit 63631c85ab663f2c941a871a535b263283b38253.
+---
+ config/evolution.mk | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/config/evolution.mk b/config/evolution.mk
+index 80648a5..7b702a6 100644
+--- a/config/evolution.mk
++++ b/config/evolution.mk
+@@ -11,7 +11,6 @@ PRODUCT_PRODUCT_PROPERTIES += \
+     persist.sys.pihooks_SDK_INT?=32
+ 
+ PRODUCT_BUILD_PROP_OVERRIDES += \
+-    BuildFingerprint=google/husky_beta/husky:16/BP41.250822.010/14082742:user/release-keys \
+     PihooksGmsFp="google/husky_beta/husky:16/BP41.250822.010/14082742:user/release-keys" \
+     PihooksGmsModel="Pixel 8 Pro"
+ 
+-- 
+2.50.1
+
